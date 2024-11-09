@@ -318,7 +318,82 @@ void ej4(){
     }
 }
 
+
+//5. Analice la posibilidad de modificar la regla de activación a: σi=tanh(∑jwijσj−θiT) , donde  T  es una temperatura efectiva y los  σi  son ahora continuos y toman valores en el intervalo  [−1,1] .
+void displayNetwork(sf::RenderWindow& window, const vector<float>& pattern) {
+    window.clear(); // Limpia la ventana antes de dibujar
+
+    int width = window.getSize().x / cellSize;
+    int height = window.getSize().y / cellSize;
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int index = y * width + x;
+            
+            sf::RectangleShape cell(sf::Vector2f(cellSize, cellSize));
+            cell.setPosition(x * cellSize, y * cellSize);
+
+            //Cambia el color de la neurona en escala de grises
+            int color = (pattern[index] + 1) * 127.5;
+            cell.setFillColor(sf::Color(color, color, color));
+
+            cell.setOutlineColor(sf::Color::Black);
+            cell.setOutlineThickness(2);
+
+            window.draw(cell);
+        }
+    }
+
+    window.display(); // Muestra lo que se ha dibujado en la ventana
+}
+std::vector<float> imagenContinua(const std::vector<uint8_t>& image) {
+    std::vector<float> imagenContinua(image.size());
+    for (size_t i = 0; i < image.size(); ++i) {
+        imagenContinua[i] = (image.at(i) - 127.5) / 127.5;
+    }
+    return imagenContinua;
+}
+
+patronC patronAAlmacenarC;
+void neuronasConErrorC(vector<NeuronaC>& neuronas){
+    for(int i = 0; i < neuronas.size(); i++){
+        neuronas[i] = patronAAlmacenarC[i];
+        if(rand()%100 < 10) neuronas[i] += 0.1*(2*(rand()%2)-1);
+    }
+}
+void ej5(){
+    srand(time(NULL));
+
+    auto images = readMNISTImages(imagePath, numImages, numRows, numCols);
+    patronAAlmacenarC = imagenContinua(images[1]);
+
+    int N = numRows*numCols;
+    RedContinua red(N, 1);
+    red.inicializarNeuronas(neuronasConErrorC);
+    red.cargarPatron(patronAAlmacenarC);
+    red.entrenar();
+    red.calcularUmbrales(umbralesNulos);
+
+    sf::RenderWindow window(sf::VideoMode(numRows * cellSize, numCols * cellSize), "Red Continua");
+    displayNetwork(window,patronAAlmacenarC);
+    sf::sleep(sf::seconds(1));
+
+    for(int i = 0; i < 5000; i++){
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+        red.evolucionar();
+        vector<NeuronaC> neuronas = red.obtenerNeuronas();
+        displayNetwork(window,neuronas);
+        sf::sleep(sf::milliseconds(10));
+    }
+    
+}
+
+
 int main(){
-    ej4();
+    ej5();
     return 0;
 }

@@ -78,3 +78,68 @@ float Red::obtenerEnergia(){
 vector<Neurona> Red::obtenerNeuronas(){
     return neuronas;
 }
+
+RedContinua::RedContinua(int N, float T): N(N), T(T){
+    neuronas = vector<NeuronaC>(N);
+    w = vector<vector<float>>(N, vector<float>(N));
+    th = vector<float>(N);
+    M = 0;
+    E = 0.0;
+}
+
+void RedContinua::inicializarNeuronas(void (*f)(vector<NeuronaC>&)){
+    f(neuronas);
+}
+
+void RedContinua::cargarPatron(patronC p){
+    patrones.push_back(p);
+    M++;
+}
+
+void RedContinua::entrenar(){
+    #pragma omp parallel for
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
+            if(i != j){
+                for(int m = 0; m < M; m++){
+                    #pragma omp atomic
+                    w[i][j] += patrones[m][i]*patrones[m][j];
+                }
+                w[i][j] /= M;
+            }
+        }
+    }
+}
+
+void RedContinua::calcularUmbrales(void (*f)(vector<float>&th)){
+    f(th);
+}
+
+void RedContinua::calcularEnergia(){
+    E = 0;
+    #pragma omp parallel for reduction(+:E)
+    for(int i = 0; i < N; i++){
+        E += th[i]*neuronas[i];
+        for(int j = 0; j < N; j++){
+            E -= 0.5*w[i][j]*neuronas[i]*neuronas[j];
+        }
+    }
+}
+
+void RedContinua::evolucionar(){
+    int i = rand()%N;
+    float r = 0.0;
+    for(int j = 0; j < N; j++){
+        r += w[i][j]*neuronas[j];
+    }
+    neuronas[i] = tanh((r-th[i])/T);
+}
+
+float RedContinua::obtenerEnergia(){
+    calcularEnergia();
+    return E;
+}
+
+vector<NeuronaC> RedContinua::obtenerNeuronas(){
+    return neuronas;
+}
