@@ -4,3 +4,4 @@ train-labels.idx1-ubyte
 *.exe
 Resultados/
 .vscode
+graficos.ipynb

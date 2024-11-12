@@ -1,4 +1,6 @@
-#include "hopfield.hpp"
+#include "headers/hopfield.hpp"
+#include "headers/mnist.hpp"
+#include "headers/sfml.hpp"
 #include <fstream>
 #include <SFML/Graphics.hpp>
 // #include <opencv2/opencv.hpp> //CREO QUE ACA HAY ERROR YA QUE DESCARGE VC16 QUE ES LA VERSION DE VISUAL, NECESITO LA DE MINGW
@@ -25,77 +27,6 @@
 
 //     return binaryImage;
 // }
-
-// Lee el encabezado de las imágenes MNIST y devuelve un vector de imágenes
-std::vector<std::vector<uint8_t>> readMNISTImages(const std::string& filePath, int& numImages, int& numRows, int& numCols) {
-    std::ifstream file(filePath, std::ios::binary);
-    if (!file.is_open()) {
-        throw std::runtime_error("No se pudo abrir el archivo de imágenes MNIST.");
-    }
-
-    int magicNumber = 0;
-    file.read(reinterpret_cast<char*>(&magicNumber), 4);
-    magicNumber = __builtin_bswap32(magicNumber);
-    if (magicNumber != 2051) {
-        throw std::runtime_error("Número mágico inválido en el archivo de imágenes MNIST.");
-    }
-
-    file.read(reinterpret_cast<char*>(&numImages), 4);
-    numImages = __builtin_bswap32(numImages);
-
-    file.read(reinterpret_cast<char*>(&numRows), 4);
-    numRows = __builtin_bswap32(numRows);
-
-    file.read(reinterpret_cast<char*>(&numCols), 4);
-    numCols = __builtin_bswap32(numCols);
-
-    std::vector<std::vector<uint8_t>> images(numImages, std::vector<uint8_t>(numRows * numCols));
-    for (int i = 0; i < numImages; ++i) {
-        file.read(reinterpret_cast<char*>(images[i].data()), numRows * numCols);
-    }
-
-    file.close();
-    return images;
-}
-
-std::vector<int> binarizeImage(const std::vector<uint8_t>& image) {
-    std::vector<int> binaryImage(image.size());
-    for (size_t i = 0; i < image.size(); ++i) {
-        binaryImage[i] = (image[i] > 128) ? 1 : -1;
-    }
-    return binaryImage;
-}
-
-const int cellSize = 25;
-void displayNetwork(sf::RenderWindow& window, const std::vector<int>& pattern) {
-    window.clear(); // Limpia la ventana antes de dibujar
-
-    int width = window.getSize().x / cellSize;
-    int height = window.getSize().y / cellSize;
-
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            int index = y * width + x;
-            
-            sf::RectangleShape cell(sf::Vector2f(cellSize, cellSize));
-            cell.setPosition(x * cellSize, y * cellSize);
-
-            // Cambia el color según el valor de la neurona (-1 o 1)
-            if (pattern[index] == 1) {
-                cell.setFillColor(sf::Color::Green);
-            } else {
-                cell.setFillColor(sf::Color::Red);
-            }
-
-            cell.setOutlineColor(sf::Color::Black);
-            cell.setOutlineThickness(2);
-
-            window.draw(cell);
-        }
-    }
-
-    window.display(); // Muestra lo que se ha dibujado en la ventana
-}
 
 //Comenzando de condiciones iniciales al azar para las neuronas analice la evolución de la energía en función de los pasos de evolución de la red.
 void umbralesNulos(vector<float>& th){
@@ -394,6 +325,6 @@ void ej5(){
 
 
 int main(){
-    ej5();
+    ej3();
     return 0;
 }

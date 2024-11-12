@@ -1,5 +1,5 @@
-#include "hopfield.hpp"
-#include "omp.h"
+#include "headers/hopfield.hpp"
+#include <omp.h>
 
 Red::Red(int N): N(N){
     neuronas = vector<Neurona>(N);
