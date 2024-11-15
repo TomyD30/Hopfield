@@ -26,6 +26,7 @@ class Red{
         void evolucionar();
         float obtenerEnergia();
         vector<Neurona> obtenerNeuronas();
+        vector<vector<float>> obtenerPesos();
 };
 
 //seguramente transforme este en una RedSimple y luego cree otra para la parte de meterle temperatura

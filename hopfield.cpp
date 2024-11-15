@@ -19,16 +19,16 @@ void Red::cargarPatron(patron p){
 }
 
 void Red::entrenar(){
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for(int i = 0; i < N; i++){
-        for(int j = 0; j < N; j++){
-            if(i != j){
-                for(int m = 0; m < M; m++){
-                    #pragma omp atomic
-                    w[i][j] += patrones[m][i]*patrones[m][j];
-                }
-                w[i][j] /= M;
+        w[i][i] = 0;
+        for(int j = i+1; j < N; j++){
+            for(int m = 0; m < M; m++){
+                //#pragma omp atomic
+                w[i][j] += patrones[m][i]*patrones[m][j];
             }
+            w[i][j] /= M;
+            w[j][i] = w[i][j];
         }
     }
 }
@@ -39,27 +39,15 @@ void Red::calcularUmbrales(void (*f)(vector<float>&th)){
 
 void Red::calcularEnergia(){
     E = 0;
-    #pragma omp parallel for reduction(+:E)
+    //#pragma omp parallel for reduction(+:E)
     for(int i = 0; i < N; i++){
         E += th[i]*neuronas[i];
         for(int j = 0; j < N; j++){
-            E -= 0.5*w[i][j]*neuronas[i]*neuronas[j];
+            E += -0.5*w[i][j]*neuronas[i]*neuronas[j];
         }
     }
 }
 
-// void Red::evolucionar(){
-//     do{
-//         calcularEnergia();
-//         int i = rand()%N;
-//         float r = 0.0;
-//         for(int j = 0; j < N; j++){
-//             r+= w[i][j]*neuronas[j];
-//         }
-//         if(r >= th[i]) neuronas[i] = 1;
-//         else neuronas[i] = -1;
-//     }while(E < 1e-5); //esto no se si esta bien, que seria la condicion de estable? supuse E = 0
-// }
 void Red::evolucionar(){
     int i = rand()%N;
     float r = 0.0;
@@ -78,6 +66,10 @@ float Red::obtenerEnergia(){
 vector<Neurona> Red::obtenerNeuronas(){
     return neuronas;
 }
+
+vector<vector<float>> Red::obtenerPesos(){
+    return w;
+}   
 
 RedContinua::RedContinua(int N, float T): N(N), T(T){
     neuronas = vector<NeuronaC>(N);
@@ -133,6 +125,7 @@ void RedContinua::evolucionar(){
         r += w[i][j]*neuronas[j];
     }
     neuronas[i] = tanh((r-th[i])/T);
+    T *= 0.999;
 }
 
 float RedContinua::obtenerEnergia(){
