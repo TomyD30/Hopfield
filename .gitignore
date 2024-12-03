@@ -1,7 +1,7 @@
-*.dll
-train-images.idx3-ubyte
 train-labels.idx1-ubyte
 *.exe
 Resultados/
 .vscode
 graficos.ipynb
+notas.txt
+*.pdf
