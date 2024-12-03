@@ -2,7 +2,7 @@
 
 ## Funcionamiento general de la red
 Los archivos [hopfield.cpp](./hopfield.cpp) y [hopfield.hpp](./headers/hopfield.hpp) describen el funcionamiento general de la red.
-Los archivos [ejercicios.cpp](./ejercicios.cpp) y [ejercicios.hpp][./headers/ejercicios.hpp] tienen los análisis que se hicieron sobre la red.
+Los archivos [ejercicios.cpp](./ejercicios.cpp) y [ejercicios.hpp](./headers/ejercicios.hpp) tienen los análisis que se hicieron sobre la red.
 Se requiere de la librería [OpenMP](https://www.openmp.org/) para la pararelización del código.
 ## Imagenes utilizadas para entrenar la red
 Los archivos [mnist.cpp](./mnist.cpp) y [mnist.hpp](./headers/mnist.hpp) tienen funciones utilizadas para el manejo de las imagenes de MNIST utilizadas para entrenar la red.
